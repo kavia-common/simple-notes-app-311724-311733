@@ -25,12 +25,13 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000",
         "http://127.0.0.1:3000",
-        # Some environments may access the UI through the same host but different
-        # port; allowing the apex domain covers those cases.
+        # Preview environment frontend origin (note the port).
+        "https://vscode-internal-19014-beta.beta01.cloud.kavia.ai:3000",
+        # Also allow API/docs without specifying a port.
         "https://vscode-internal-19014-beta.beta01.cloud.kavia.ai",
-        "https://*.cloud.kavia.ai",
     ],
-    allow_origin_regex=r"^https:\/\/.*\.cloud\.kavia\.ai$",
+    # Allow any *.cloud.kavia.ai origin, with optional port.
+    allow_origin_regex=r"^https:\/\/.*\.cloud\.kavia\.ai(?::\d+)?$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
