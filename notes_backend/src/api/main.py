@@ -22,6 +22,10 @@ app = FastAPI(
 # to only http://localhost:3000 will cause browser "Failed to fetch".
 app.add_middleware(
     CORSMiddleware,
+    # NOTE: This app has no authentication, so we explicitly disable credentials.
+    # This avoids the stricter browser CORS rules around credentialed requests
+    # (and eliminates a common cause of "Failed to fetch" in preview setups).
+    allow_credentials=False,
     allow_origins=[
         "http://localhost:3000",
         "http://127.0.0.1:3000",
@@ -32,9 +36,9 @@ app.add_middleware(
     ],
     # Allow any *.cloud.kavia.ai origin, with optional port.
     allow_origin_regex=r"^https:\/\/.*\.cloud\.kavia\.ai(?::\d+)?$",
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    # Be explicit about methods/headers to satisfy strict preflight checks.
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["Content-Type"],
 )
 
 
@@ -55,4 +59,9 @@ def health_check():
     return {"status": "ok"}
 
 
+# Main routes
 app.include_router(notes_router)
+
+# Compatibility routes: some frontends/proxies use an `/api` prefix.
+# Including the same router under `/api` prevents route-mismatch "Failed to fetch".
+app.include_router(notes_router, prefix="/api")
