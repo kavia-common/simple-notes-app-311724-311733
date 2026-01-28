@@ -36,9 +36,11 @@ app.add_middleware(
     ],
     # Allow any *.cloud.kavia.ai origin, with optional port.
     allow_origin_regex=r"^https:\/\/.*\.cloud\.kavia\.ai(?::\d+)?$",
-    # Be explicit about methods/headers to satisfy strict preflight checks.
+    # Be explicit about methods to satisfy strict preflight checks.
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allow_headers=["Content-Type"],
+    # Allow all headers so browser preflight does not fail if the frontend adds
+    # additional headers (e.g. Authorization, X-Requested-With, etc.).
+    allow_headers=["*"],
 )
 
 
