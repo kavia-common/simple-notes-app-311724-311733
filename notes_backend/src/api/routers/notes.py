@@ -12,7 +12,10 @@ from src.api.storage.notes_store import NotesStore
 
 router = APIRouter(prefix="/notes", tags=["Notes"])
 
-_DATA_DIR = os.path.join(os.getcwd(), "data")
+# Resolve the data directory relative to the backend container root, not the
+# current working directory (which can differ depending on how uvicorn is run).
+_BACKEND_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
+_DATA_DIR = os.path.join(_BACKEND_ROOT, "data")
 _STORE_PATH = os.path.join(_DATA_DIR, "notes.json")
 store = NotesStore(file_path=_STORE_PATH)
 

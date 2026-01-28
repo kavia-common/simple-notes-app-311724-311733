@@ -17,9 +17,20 @@ app = FastAPI(
 
 # For preview/dev, explicitly allow the React dev server.
 # If deploying elsewhere, this can be tightened further.
+# CORS: allow the preview frontend origin (cloud) and local dev.
+# In preview environments the UI is served from a kavia.ai host, so restricting
+# to only http://localhost:3000 will cause browser "Failed to fetch".
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        # Some environments may access the UI through the same host but different
+        # port; allowing the apex domain covers those cases.
+        "https://vscode-internal-19014-beta.beta01.cloud.kavia.ai",
+        "https://*.cloud.kavia.ai",
+    ],
+    allow_origin_regex=r"^https:\/\/.*\.cloud\.kavia\.ai$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
